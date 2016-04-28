@@ -63,6 +63,21 @@ describe BotMetrics do
         it 'should return true' do
           expect(BotMetrics.register_bot!('bot_token')).to be_truthy
         end
+
+        context 'when created_at is sent as a param' do
+          before do
+            @now = Time.now
+
+            stub_request(:post, "https://www.getbotmetrics.com/teams/tdeadbeef1/bots/bot_id/instances").
+                    with(body: "instance%5Btoken%5D=bot_token&instance%5Bcreated_at%5D=#{@now.to_i}&format=json",
+                         headers: { "Authorization" => 'bot_api_key' }).
+                    to_return(body: "{\"id\":1}", status: 201)
+          end
+
+          it 'should return true' do
+            expect(BotMetrics.register_bot!('bot_token', created_at: @now)).to be_truthy
+          end
+        end
       end
 
       context 'when BOTMETRICS_API_HOST is set' do
