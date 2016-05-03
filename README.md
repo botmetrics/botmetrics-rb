@@ -1,8 +1,8 @@
-# Botmetrics::Rb
+# Botmetrics
 
-Welcome to your new gem! In this directory, you'll find the files you need to be able to package up your Ruby library into a gem. Put your Ruby code in the file `lib/botmetrics/rb`. To experiment with that code, run `bin/console` for an interactive prompt.
-
-TODO: Delete this and the text above, and describe your gem
+Botmetrics is a Ruby client to the
+[BotMetrics](https://getbotmetrics.com) service which lets you collect
+&amp; analyze metrics for your bot.
 
 ## Installation
 
@@ -22,7 +22,34 @@ Or install it yourself as:
 
 ## Usage
 
-TODO: Write usage instructions here
+Log in to your [BotMetrics](https://getbotmetrics.com) account, navigate
+to "Bot Settings" and find out your Team ID, Bot ID and API Key.
+
+Set the following environment variables with the Team ID, Bot ID and API
+Key respectively.
+
+```
+BOTMETRICS_TEAM_ID=your-team-id
+BOTMETRICS_BOT_ID=your-bot-id
+BOTMETRICS_API_KEY=your-api-key
+```
+
+Once you have that set up, every time you create a new Slack Bot (in the
+OAuth2 callback), and assuming the bot token you received as part of the
+OAuth2 callback is `bot-token`, make the following call:
+
+```ruby
+BotMetrics.register_bot!('bot-token')
+```
+
+### Retroactive registration
+
+If you created your bot in the past, you can pass in `created_at` with
+the UNIX timestamp of when your bot was created, like so:
+
+```ruby
+BotMetrics.register_bot!('bot-token', created_at: 1462318092)
+```
 
 ## Development
 
