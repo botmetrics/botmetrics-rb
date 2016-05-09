@@ -2,7 +2,7 @@ require "json"
 require "excon"
 
 class BotMetrics
-  VERSION = "0.0.2"
+  VERSION = "0.0.3"
 
   def self.register_bot!(token, opts = {})
     bot_id = opts[:bot_id] || opts['bot_id'] || ENV['BOTMETRICS_BOT_ID']
