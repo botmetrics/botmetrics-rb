@@ -23,13 +23,11 @@ Or install it yourself as:
 ## Usage
 
 Log in to your [BotMetrics](https://getbotmetrics.com) account, navigate
-to "Bot Settings" and find out your Team ID, Bot ID and API Key.
+to "Bot Settings" and find out your Bot ID and API Key.
 
-Set the following environment variables with the Team ID, Bot ID and API
-Key respectively.
+Set the following environment variables with the Bot ID and API Key respectively.
 
 ```
-BOTMETRICS_TEAM_ID=your-team-id
 BOTMETRICS_BOT_ID=your-bot-id
 BOTMETRICS_API_KEY=your-api-key
 ```
@@ -42,7 +40,7 @@ OAuth2 callback is `bot-token`, make the following call:
 BotMetrics.register_bot!('bot-token')
 ```
 
-### Retroactive registration
+### Retroactive Registration
 
 If you created your bot in the past, you can pass in `created_at` with
 the UNIX timestamp of when your bot was created, like so:
