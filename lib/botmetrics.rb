@@ -1,42 +1,54 @@
 require "json"
 require "excon"
 
-class BotMetrics
-  VERSION = "0.0.3"
+module BotMetrics
+  class Client
+    DEFAULT_API_HOST = "https://www.getbotmetrics.com".freeze
 
-  def self.register_bot!(token, opts = {})
-    bot_id = opts[:bot_id] || opts['bot_id'] || ENV['BOTMETRICS_BOT_ID']
-    api_key = opts[:api_key] || opts['api_key'] || ENV['BOTMETRICS_API_KEY']
+    def initialize(api_key:, bot_id:, api_host: nil)
+      if api_key.nil? || api_key == ""
+        raise ArgumentError.new("Missing argument api_key. Please pass api_key in as an argument.")
+      end
 
-    if bot_id.nil? || bot_id == ""
-      raise ArgumentError.new("You have to either set the env variable BOTMETRICS_BOT_ID or pass in an as argument bot_id")
+      if bot_id.nil? || bot_id == ""
+        raise ArgumentError.new("Missing argument bot_id. Please pass bot_id in as an argument.")
+      end
+
+      @api_key  = api_key
+      @bot_id   = bot_id
+      @api_host = api_host || DEFAULT_API_HOST
     end
-    if api_key.nil? || api_key == ""
-      raise ArgumentError.new("You have to either set the env variable BOTMETRICS_API_KEY or pass in an as argument api_key")
+
+    def register_bot!(token, opts = {})
+      params = { "instance[token]" => token, "format" => "json" }
+
+      created_at = opts[:created_at] || opts["created_at"]
+      params["instance[created_at]"] = created_at.to_i if created_at.to_i != 0
+
+      connection = Excon.new("#{api_url}/instances", options(body: URI.encode_www_form(params)))
+      response = connection.request(method: :post)
+
+      response.status == 201
     end
 
-    created_at = opts[:created_at] || opts['created_at']
-    host = ENV['BOTMETRICS_API_HOST'] || 'https://www.getbotmetrics.com'
+    private
 
-    opts = {
-      omit_default_port: true,
-      idempotent: true,
-      retry_limit: 6,
-      read_timeout: 360,
-      connect_timeout: 360
-    }
+      attr_accessor :api_key, :bot_id, :api_host
 
-    params = { "instance[token]" => token }
-    params["instance[created_at]"] = created_at.to_i if created_at.to_i != 0
-    params["format"] = "json"
+      def api_url
+        "#{api_host}/bots/#{bot_id}"
+      end
 
-    url = "#{host}/bots/#{bot_id}/instances"
-    opts[:body] = URI.encode_www_form(params)
-    opts[:headers] = { "Authorization" => api_key }
-
-    connection = Excon.new(url, opts)
-    response = connection.request(method: :post)
-
-    response.status == 201
+      def options(extra_params)
+        {
+          headers: { "Authorization" => api_key },
+          omit_default_port: true,
+          idempotent: true,
+          retry_limit: 6,
+          read_timeout: 360,
+          connect_timeout: 360
+        }.merge(extra_params)
+      end
   end
+
 end
