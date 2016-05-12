@@ -1,96 +1,143 @@
 require 'spec_helper'
 
 describe BotMetrics do
-  describe '.register_bot!' do
-    context 'api_key is not set' do
-      before do
-        ENV['BOTMETRICS_BOT_ID'] = 'bot_id'
+  describe '#initialize' do
+    context 'without ENV variables' do
+      context 'when api_key is not set' do
+        it 'raises an error' do
+          expect {
+            BotMetrics::Client.new(api_key: nil, bot_id: 'bot_id')
+          }.to raise_error("Missing argument api_key. Please pass api_key in as an argument.")
+        end
       end
 
-      after do
-        ENV['BOTMETRICS_BOT_ID'] = nil
+      context 'when bot_id is not set' do
+        it 'raises an error' do
+          expect {
+            BotMetrics::Client.new(api_key: 'api_key', bot_id: nil)
+          }.to raise_error("Missing argument bot_id. Please pass bot_id in as an argument.")
+        end
       end
 
-      it 'should raise an error' do
-        expect {
-          BotMetrics.register_bot!('bot_token')
-        }.to raise_error("You have to either set the env variable BOTMETRICS_API_KEY or pass in an as argument api_key")
+      context 'when api_key and bot_id are set' do
+        it 'works' do
+          client = BotMetrics::Client.new(api_key: 'api_key', bot_id: 'bot_id')
+          expect(client.instance_variable_get(:@api_key)).to eq 'api_key'
+          expect(client.instance_variable_get(:@bot_id)).to eq 'bot_id'
+        end
       end
     end
 
-    context 'bot_id is not set' do
-      it 'should raise an error' do
-        expect {
-          BotMetrics.register_bot!('bot_token')
-        }.to raise_error("You have to either set the env variable BOTMETRICS_BOT_ID or pass in an as argument bot_id")
-      end
-    end
-
-    context 'with BOTMETRICS_BOT_ID and BOTMETRICS_API_KEY env variables set' do
+    context 'with ENV variables' do
       before do
-        ENV['BOTMETRICS_BOT_ID'] = 'bot_id'
-        ENV['BOTMETRICS_API_KEY'] = 'bot_api_key'
+        ENV['BOTMETRICS_API_KEY']  = 'api_key'
+        ENV['BOTMETRICS_BOT_ID']   = 'bot_id'
+        ENV['BOTMETRICS_API_HOST'] = 'api_host'
       end
 
       after do
-        ENV['BOTMETRICS_BOT_ID'] = nil
-        ENV['BOTMETRICS_API_KEY'] = nil
+        ENV['BOTMETRICS_API_KEY']  = nil
+        ENV['BOTMETRICS_BOT_ID']   = nil
+        ENV['BOTMETRICS_API_HOST'] = nil
       end
 
-      context 'when BOTMETRICS_API_HOST is not set' do
-        before do
-          stub_request(:post, "https://www.getbotmetrics.com/bots/bot_id/instances").
-                       with(body: "instance%5Btoken%5D=bot_token&format=json",
-                            headers: { "Authorization" => 'bot_api_key' }).
-                       to_return(body: "{\"id\":1}", status: 201)
-        end
+      it 'defaults to ENV' do
+        client = BotMetrics::Client.new
+        expect(client.instance_variable_get(:@api_key)).to eq 'api_key'
+        expect(client.instance_variable_get(:@bot_id)).to eq 'bot_id'
+        expect(client.instance_variable_get(:@api_host)).to eq 'api_host'
+      end
+    end
+  end
 
-        it 'should return true' do
-          expect(BotMetrics.register_bot!('bot_token')).to be_truthy
-        end
+  describe '#register_bot!' do
+    context 'when api_host is not set' do
+      let(:client) { BotMetrics::Client.new(api_key: 'api_key', bot_id: 'bot_id') }
 
-        context 'when created_at is sent as a param' do
-          before do
-            @now = Time.now
-
-            stub_request(:post, "https://www.getbotmetrics.com/bots/bot_id/instances").
-                    with(body: "instance%5Btoken%5D=bot_token&instance%5Bcreated_at%5D=#{@now.to_i}&format=json",
-                         headers: { "Authorization" => 'bot_api_key' }).
-                    to_return(body: "{\"id\":1}", status: 201)
-          end
-
-          it 'should return true' do
-            expect(BotMetrics.register_bot!('bot_token', created_at: @now)).to be_truthy
-          end
-        end
+      before do
+        stub_request(:post, "https://www.getbotmetrics.com/bots/bot_id/instances?instance%5Btoken%5D=bot_token&format=json").
+          with(headers: { "Authorization" => 'api_key' }).
+          to_return(body: "{\"id\":1}", status: 201)
       end
 
-      context 'when BOTMETRICS_API_HOST is set' do
+      it { expect(client.register_bot!('bot_token')).to be_truthy }
+
+      context 'when created_at is sent as a param' do
         before do
-          ENV['BOTMETRICS_API_HOST'] = 'http://localhost:5000'
-          stub_request(:post, "http://localhost:5000/bots/bot_id/instances").
-                       with(body: "instance%5Btoken%5D=bot_token&format=json",
-                            headers: { "Authorization" => 'bot_api_key' }).
-                       to_return(body: "{\"id\":1}", status: 201)
+          @now = Time.now
+
+          stub_request(
+            :post,
+            "https://www.getbotmetrics.com/bots/bot_id/instances?instance%5Btoken%5D=bot_token&format=json&instance%5Bcreated_at%5D=#{@now.to_i}"
+          ).
+            with(headers: { "Authorization" => 'api_key' }).
+            to_return(body: "{\"id\":1}", status: 201)
         end
 
-        it 'should return true' do
-          expect(BotMetrics.register_bot!('bot_token')).to be_truthy
-        end
+        it { expect(client.register_bot!('bot_token', created_at: @now)).to be_truthy }
+      end
+    end
+
+    context 'when api_host is set' do
+      let(:client) { BotMetrics::Client.new(api_key: 'api_key', bot_id: 'bot_id', api_host: 'http://localhost:5000') }
+
+      before do
+        stub_request(
+          :post,
+          "http://localhost:5000/bots/bot_id/instances?instance%5Btoken%5D=bot_token&format=json"
+        ).
+          with(headers: { "Authorization" => 'api_key' }).
+          to_return(body: "{\"id\":1}", status: 201)
       end
 
-      context 'when you pass in arguments' do
-        before do
-          stub_request(:post, "http://localhost:5000/bots/another_bot_id/instances").
-                       with(body: "instance%5Btoken%5D=bot_token&format=json",
-                            headers: { "Authorization" => 'another_bot_api_key' }).
-                       to_return(body: "{\"id\":1}", status: 201)
-        end
+      it { expect(client.register_bot!('bot_token')).to be_truthy }
+    end
+  end
 
-        it 'should return true' do
-          expect(BotMetrics.register_bot!('bot_token', bot_id: 'another_bot_id',
-                                                       api_key: 'another_bot_api_key')).to be_truthy
-        end
+  describe '#message' do
+    let(:client) { BotMetrics::Client.new(api_key: 'api_key', bot_id: 'bot_id') }
+
+    context 'message with text' do
+      before do
+        stub_request(:post, "https://www.getbotmetrics.com/bots/bot_id/messages?message%5Bteam_id%5D=T123&message%5Buser%5D=U123&message%5Btext%5D=Text").
+          with(headers: { "Authorization" => 'api_key' }).
+          to_return(status: 202)
+      end
+
+      it { expect(client.message(team_id: 'T123', user: 'U123', text: 'Text')).to be_truthy }
+    end
+
+    context 'message with attachments as non string' do
+      before do
+        stub_request(:post, "https://www.getbotmetrics.com/bots/bot_id/messages?message%5Battachments%5D=%5B%7B%22pretext%22:%22Hi!%22,%22title%22:%22Hello!%22%7D%5D&message%5Bteam_id%5D=T123&message%5Buser%5D=U123").
+          with(:headers => { 'Authorization'=>'api_key' }).
+          to_return(status: 202)
+      end
+
+      it { expect(client.message(team_id: 'T123', user: 'U123', attachments: [{ pretext: 'Hi!', title: 'Hello!' }])).to be_truthy }
+    end
+
+    context 'message with attachments as string' do
+      before do
+        stub_request(:post, "https://www.getbotmetrics.com/bots/bot_id/messages?message%5Battachments%5D=%5B%7B%22pretext%22:%22Hi!%22,%22title%22:%22Hello!%22%7D%5D&message%5Bteam_id%5D=T123&message%5Buser%5D=U123").
+          with(:headers => { 'Authorization'=>'api_key' }).
+          to_return(status: 202)
+      end
+
+      it { expect(client.message(team_id: 'T123', user: 'U123', attachments: [{ pretext: 'Hi!', title: 'Hello!' }].to_json)).to be_truthy }
+    end
+
+    context 'failures' do
+      it 'raises error when both channel and user are blank' do
+        expect {
+          client.message(team_id: 'T123', text: 'Hello!')
+        }.to raise_error("Missing argument channel and user. Please provide at least one.")
+      end
+
+      it 'raises error when both text and attachments are blank' do
+        expect {
+          client.message(team_id: 'T123', user: 'U123')
+        }.to raise_error("Missing argument text and attachments. Please provide at least one.")
       end
     end
   end
