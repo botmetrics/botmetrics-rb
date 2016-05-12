@@ -95,5 +95,19 @@ describe BotMetrics do
 
       it { expect(client.message(team_id: 'T123', user: 'U123', attachments: [{ pretext: 'Hi!', title: 'Hello!' }].to_json)).to be_truthy }
     end
+
+    context 'failures' do
+      it 'raises error when both channel and user are blank' do
+        expect {
+          client.message(team_id: 'T123', text: 'Hello!')
+        }.to raise_error("Missing argument channel and user. Please provide at least one.")
+      end
+
+      it 'raises error when both text and attachments are blank' do
+        expect {
+          client.message(team_id: 'T123', user: 'U123')
+        }.to raise_error("Missing argument text and attachments. Please provide at least one.")
+      end
+    end
   end
 end

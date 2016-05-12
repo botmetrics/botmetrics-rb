@@ -6,11 +6,11 @@ module BotMetrics
     DEFAULT_API_HOST = "https://www.getbotmetrics.com".freeze
 
     def initialize(api_key:, bot_id:, api_host: nil)
-      if api_key.nil? || api_key == ""
+      if blank?(api_key)
         raise ArgumentError.new("Missing argument api_key. Please pass api_key in as an argument.")
       end
 
-      if bot_id.nil? || bot_id == ""
+      if blank?(bot_id)
         raise ArgumentError.new("Missing argument bot_id. Please pass bot_id in as an argument.")
       end
 
@@ -31,6 +31,14 @@ module BotMetrics
     end
 
     def message(team_id:, channel: nil, user: nil, text: nil, attachments: nil)
+      if blank?(channel) && blank?(user)
+        raise ArgumentError.new("Missing argument channel and user. Please provide at least one.")
+      end
+
+      if blank?(text) && blank?(attachments)
+        raise ArgumentError.new("Missing argument text and attachments. Please provide at least one.")
+      end
+
       params = {
         "message[team_id]"     => team_id,
         "message[channel]"     => channel,
@@ -47,6 +55,10 @@ module BotMetrics
     private
 
       attr_accessor :api_key, :bot_id, :api_host
+
+      def blank?(attr)
+        attr.nil? || attr == ''
+      end
 
       def api_url
         "#{api_host}/bots/#{bot_id}"
