@@ -31,6 +31,18 @@ With that, you can initialize a `BotMetrics::Client`:
 client = BotMetrics::Client.new(api_key: '123', bot_id: '123')
 ```
 
+Alternatively, you can set the following ENV variables
+
+- `ENV['BOTMETRICS_API_KEY']` 
+- `ENV['BOTMETRICS_BOT_ID']`  
+- `ENV['BOTMETRICS_API_HOST']`
+
+and initialize a `BotMetrics::Client` with the default ENV variables:
+
+```ruby
+client = BotMetrics::Client.new
+```
+
 ### `register_bot!`
 
 With a `BotMetrics::Client` instance,

@@ -2,19 +2,50 @@ require 'spec_helper'
 
 describe BotMetrics do
   describe '#initialize' do
-    context 'when api key is not set' do
-      it 'raises an error' do
-        expect {
-          BotMetrics::Client.new(api_key: nil, bot_id: 'bot_id')
-        }.to raise_error("Missing argument api_key. Please pass api_key in as an argument.")
+    context 'without ENV variables' do
+      context 'when api_key is not set' do
+        it 'raises an error' do
+          expect {
+            BotMetrics::Client.new(api_key: nil, bot_id: 'bot_id')
+          }.to raise_error("Missing argument api_key. Please pass api_key in as an argument.")
+        end
+      end
+
+      context 'when bot_id is not set' do
+        it 'raises an error' do
+          expect {
+            BotMetrics::Client.new(api_key: 'api_key', bot_id: nil)
+          }.to raise_error("Missing argument bot_id. Please pass bot_id in as an argument.")
+        end
+      end
+
+      context 'when api_key and bot_id are set' do
+        it 'works' do
+          client = BotMetrics::Client.new(api_key: 'api_key', bot_id: 'bot_id')
+          expect(client.instance_variable_get(:@api_key)).to eq 'api_key'
+          expect(client.instance_variable_get(:@bot_id)).to eq 'bot_id'
+        end
       end
     end
 
-    context 'when bot id is not set' do
-      it 'raises an error' do
-        expect {
-          BotMetrics::Client.new(api_key: 'api_key', bot_id: nil)
-        }.to raise_error("Missing argument bot_id. Please pass bot_id in as an argument.")
+    context 'with ENV variables' do
+      before do
+        ENV['BOTMETRICS_API_KEY']  = 'api_key'
+        ENV['BOTMETRICS_BOT_ID']   = 'bot_id'
+        ENV['BOTMETRICS_API_HOST'] = 'api_host'
+      end
+
+      after do
+        ENV['BOTMETRICS_API_KEY']  = nil
+        ENV['BOTMETRICS_BOT_ID']   = nil
+        ENV['BOTMETRICS_API_HOST'] = nil
+      end
+
+      it 'defaults to ENV' do
+        client = BotMetrics::Client.new
+        expect(client.instance_variable_get(:@api_key)).to eq 'api_key'
+        expect(client.instance_variable_get(:@bot_id)).to eq 'bot_id'
+        expect(client.instance_variable_get(:@api_host)).to eq 'api_host'
       end
     end
   end

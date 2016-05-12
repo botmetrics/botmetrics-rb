@@ -5,18 +5,18 @@ module BotMetrics
   class Client
     DEFAULT_API_HOST = "https://www.getbotmetrics.com".freeze
 
-    def initialize(api_key:, bot_id:, api_host: nil)
-      if blank?(api_key)
+    def initialize(api_key: nil, bot_id: nil, api_host: nil)
+      @api_key  = api_key  || ENV['BOTMETRICS_API_KEY']
+      @bot_id   = bot_id   || ENV['BOTMETRICS_BOT_ID']
+      @api_host = api_host || ENV['BOTMETRICS_API_HOST'] || DEFAULT_API_HOST
+
+      if blank?(@api_key)
         raise ArgumentError.new("Missing argument api_key. Please pass api_key in as an argument.")
       end
 
-      if blank?(bot_id)
+      if blank?(@bot_id)
         raise ArgumentError.new("Missing argument bot_id. Please pass bot_id in as an argument.")
       end
-
-      @api_key  = api_key
-      @bot_id   = bot_id
-      @api_host = api_host || DEFAULT_API_HOST
     end
 
     def register_bot!(token, opts = {})
