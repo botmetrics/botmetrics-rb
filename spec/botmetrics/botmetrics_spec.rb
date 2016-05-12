@@ -66,12 +66,24 @@ describe BotMetrics do
   describe '#message' do
     let(:client) { BotMetrics::Client.new(api_key: 'api_key', bot_id: 'bot_id') }
 
-    before do
-      stub_request(:post, "https://www.getbotmetrics.com/bots/bot_id/messages?message%5Bteam_id%5D=T123&message%5Buser%5D=U123&message%5Btext%5D=Text").
-        with(headers: { "Authorization" => 'api_key' }).
-        to_return(body: "{\"id\":1}", status: 202)
+    context 'message with text' do
+      before do
+        stub_request(:post, "https://www.getbotmetrics.com/bots/bot_id/messages?message%5Bteam_id%5D=T123&message%5Buser%5D=U123&message%5Btext%5D=Text").
+          with(headers: { "Authorization" => 'api_key' }).
+          to_return(status: 202)
+      end
+
+      it { expect(client.message(team_id: 'T123', user: 'U123', text: 'Text')).to be_truthy }
     end
 
-    it { expect(client.message(team_id: 'T123', user: 'U123', text: 'Text')).to be_truthy }
+    context 'message with text' do
+      before do
+        stub_request(:post, "https://www.getbotmetrics.com/bots/bot_id/messages?message%5Battachments%5D=%5B%7B%22pretext%22:%22Hi!%22,%22title%22:%22Hello!%22%7D%5D&message%5Bteam_id%5D=T123&message%5Buser%5D=U123").
+          with(:headers => { 'Authorization'=>'api_key' }).
+          to_return(status: 202)
+      end
+
+      it { expect(client.message(team_id: 'T123', user: 'U123', attachments: [{ pretext: 'Hi!', title: 'Hello!' }])).to be_truthy }
+    end
   end
 end

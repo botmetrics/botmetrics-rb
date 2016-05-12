@@ -36,7 +36,7 @@ module BotMetrics
         "message[channel]"     => channel,
         "message[user]"        => user,
         "message[text]"        => text,
-        "message[attachments]" => attachments
+        "message[attachments]" => attachments.nil? ? nil : attachments.to_json
       }.delete_if { |_, v| v.nil? }
 
       response = HTTP.auth(api_key).post("#{api_url}/messages", params: params)
