@@ -4,6 +4,9 @@ Botmetrics is a Ruby client to the
 [BotMetrics](https://getbotmetrics.com) service which lets you collect
 &amp; analyze metrics for your bot.
 
+[![Build
+Status](https://travis-ci.org/botmetrics/botmetrics-rb.svg?branch=master)](https://travis-ci.org/botmetrics/botmetrics-rb)
+
 ## Installation
 
 Add this line to your application's Gemfile:
