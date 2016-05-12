@@ -62,4 +62,16 @@ describe BotMetrics do
       it { expect(client.register_bot!('bot_token')).to be_truthy }
     end
   end
+
+  describe '#message' do
+    let(:client) { BotMetrics::Client.new(api_key: 'api_key', bot_id: 'bot_id') }
+
+    before do
+      stub_request(:post, "https://www.getbotmetrics.com/bots/bot_id/messages?message%5Bteam_id%5D=T123&message%5Buser%5D=U123&message%5Btext%5D=Text").
+        with(headers: { "Authorization" => 'api_key' }).
+        to_return(body: "{\"id\":1}", status: 202)
+    end
+
+    it { expect(client.message(team_id: 'T123', user: 'U123', text: 'Text')).to be_truthy }
+  end
 end

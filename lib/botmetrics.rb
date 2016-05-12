@@ -30,6 +30,20 @@ module BotMetrics
       response.code == 201
     end
 
+    def message(team_id:, channel: nil, user: nil, text: nil, attachments: nil)
+      params = {
+        "message[team_id]"     => team_id,
+        "message[channel]"     => channel,
+        "message[user]"        => user,
+        "message[text]"        => text,
+        "message[attachments]" => attachments
+      }.delete_if { |_, v| v.nil? }
+
+      response = HTTP.auth(api_key).post("#{api_url}/messages", params: params)
+
+      response.code == 202
+    end
+
     private
 
       attr_accessor :api_key, :bot_id, :api_host
