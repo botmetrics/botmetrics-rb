@@ -33,8 +33,8 @@ client = BotMetrics::Client.new(api_key: '123', bot_id: '123')
 
 Alternatively, you can set the following ENV variables
 
-- `ENV['BOTMETRICS_API_KEY']` 
-- `ENV['BOTMETRICS_BOT_ID']`  
+- `ENV['BOTMETRICS_API_KEY']`
+- `ENV['BOTMETRICS_BOT_ID']`
 - `ENV['BOTMETRICS_API_HOST']`
 
 and initialize a `BotMetrics::Client` with the default ENV variables:
@@ -111,7 +111,7 @@ To install this gem onto your local machine, run `bundle exec rake install`. To 
 
 ## Contributing
 
-Bug reports and pull requests are welcome on GitHub at https://github.com/[USERNAME]/botmetrics-rb. This project is intended to be a safe, welcoming space for collaboration, and contributors are expected to adhere to the [Contributor Covenant](http://contributor-covenant.org) code of conduct.
+Bug reports and pull requests are welcome on GitHub at https://github.com/botmetrics/botmetrics-rb. This project is intended to be a safe, welcoming space for collaboration, and contributors are expected to adhere to the [Contributor Covenant](http://contributor-covenant.org) code of conduct.
 
 
 ## License
