@@ -36,7 +36,7 @@ module BotMetrics
         "message[channel]"     => channel,
         "message[user]"        => user,
         "message[text]"        => text,
-        "message[attachments]" => attachments.nil? ? nil : attachments.to_json
+        "message[attachments]" => message_attachments(attachments)
       }.delete_if { |_, v| v.nil? }
 
       response = HTTP.auth(api_key).post("#{api_url}/messages", params: params)
@@ -61,6 +61,18 @@ module BotMetrics
           read_timeout: 360,
           connect_timeout: 360
         }.merge(extra_params)
+      end
+
+      def message_attachments(attachments)
+        if attachments.nil?
+          nil
+        else
+          if attachments.is_a? String
+            attachments
+          else
+            attachments.to_json
+          end
+        end
       end
   end
 end
