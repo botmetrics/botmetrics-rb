@@ -1,5 +1,5 @@
 require "json"
-require "excon"
+require "http"
 
 module BotMetrics
   class Client
@@ -20,15 +20,14 @@ module BotMetrics
     end
 
     def register_bot!(token, opts = {})
-      params = { "instance[token]" => token, "format" => "json" }
+      params = { "format" => "json", "instance[token]" => token }
 
       created_at = opts[:created_at] || opts["created_at"]
       params["instance[created_at]"] = created_at.to_i if created_at.to_i != 0
 
-      connection = Excon.new("#{api_url}/instances", options(body: URI.encode_www_form(params)))
-      response = connection.request(method: :post)
+      response = HTTP.auth(api_key).post("#{api_url}/instances", params: params)
 
-      response.status == 201
+      response.code == 201
     end
 
     private
@@ -50,5 +49,4 @@ module BotMetrics
         }.merge(extra_params)
       end
   end
-
 end

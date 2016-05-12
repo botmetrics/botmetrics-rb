@@ -24,9 +24,8 @@ describe BotMetrics do
       let(:client) { BotMetrics::Client.new(api_key: 'api_key', bot_id: 'bot_id') }
 
       before do
-        stub_request(:post, "https://www.getbotmetrics.com/bots/bot_id/instances").
-          with(body:    "instance%5Btoken%5D=bot_token&format=json",
-               headers: { "Authorization" => 'api_key' }).
+        stub_request(:post, "https://www.getbotmetrics.com/bots/bot_id/instances?instance%5Btoken%5D=bot_token&format=json").
+          with(headers: { "Authorization" => 'api_key' }).
           to_return(body: "{\"id\":1}", status: 201)
       end
 
@@ -36,9 +35,11 @@ describe BotMetrics do
         before do
           @now = Time.now
 
-          stub_request(:post, "https://www.getbotmetrics.com/bots/bot_id/instances").
-            with(body:    "instance%5Btoken%5D=bot_token&format=json&instance%5Bcreated_at%5D=#{@now.to_i}",
-                 headers: { "Authorization" => 'api_key' }).
+          stub_request(
+            :post,
+            "https://www.getbotmetrics.com/bots/bot_id/instances?instance%5Btoken%5D=bot_token&format=json&instance%5Bcreated_at%5D=#{@now.to_i}"
+          ).
+            with(headers: { "Authorization" => 'api_key' }).
             to_return(body: "{\"id\":1}", status: 201)
         end
 
@@ -50,9 +51,11 @@ describe BotMetrics do
       let(:client) { BotMetrics::Client.new(api_key: 'api_key', bot_id: 'bot_id', api_host: 'http://localhost:5000') }
 
       before do
-        stub_request(:post, "http://localhost:5000/bots/bot_id/instances").
-          with(body:    "instance%5Btoken%5D=bot_token&format=json",
-               headers: { "Authorization" => 'api_key' }).
+        stub_request(
+          :post,
+          "http://localhost:5000/bots/bot_id/instances?instance%5Btoken%5D=bot_token&format=json"
+        ).
+          with(headers: { "Authorization" => 'api_key' }).
           to_return(body: "{\"id\":1}", status: 201)
       end
 
