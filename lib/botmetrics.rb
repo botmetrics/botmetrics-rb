@@ -30,7 +30,12 @@ module BotMetrics
       response.code == 201
     end
 
-    def message(team_id:, channel: nil, user: nil, text: nil, attachments: nil)
+    def message(team_id, opts = {})
+      channel = opts[:channel]
+      user = opts[:user]
+      text = opts[:text]
+      attachments = opts[:attachments]
+
       if blank?(channel) && blank?(user)
         raise ArgumentError.new("Missing argument channel and user. Please provide at least one.")
       end

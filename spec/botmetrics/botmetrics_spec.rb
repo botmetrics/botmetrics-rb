@@ -104,7 +104,7 @@ describe BotMetrics do
           to_return(status: 202)
       end
 
-      it { expect(client.message(team_id: 'T123', user: 'U123', text: 'Text')).to be_truthy }
+      it { expect(client.message('T123', user: 'U123', text: 'Text')).to be_truthy }
     end
 
     context 'message with attachments as non string' do
@@ -114,7 +114,7 @@ describe BotMetrics do
           to_return(status: 202)
       end
 
-      it { expect(client.message(team_id: 'T123', user: 'U123', attachments: [{ pretext: 'Hi!', title: 'Hello!' }])).to be_truthy }
+      it { expect(client.message('T123', user: 'U123', attachments: [{ pretext: 'Hi!', title: 'Hello!' }])).to be_truthy }
     end
 
     context 'message with attachments as string' do
@@ -124,19 +124,19 @@ describe BotMetrics do
           to_return(status: 202)
       end
 
-      it { expect(client.message(team_id: 'T123', user: 'U123', attachments: [{ pretext: 'Hi!', title: 'Hello!' }].to_json)).to be_truthy }
+      it { expect(client.message('T123', user: 'U123', attachments: [{ pretext: 'Hi!', title: 'Hello!' }].to_json)).to be_truthy }
     end
 
     context 'failures' do
       it 'raises error when both channel and user are blank' do
         expect {
-          client.message(team_id: 'T123', text: 'Hello!')
+          client.message('T123', text: 'Hello!')
         }.to raise_error("Missing argument channel and user. Please provide at least one.")
       end
 
       it 'raises error when both text and attachments are blank' do
         expect {
-          client.message(team_id: 'T123', user: 'U123')
+          client.message('T123', user: 'U123')
         }.to raise_error("Missing argument text and attachments. Please provide at least one.")
       end
     end
