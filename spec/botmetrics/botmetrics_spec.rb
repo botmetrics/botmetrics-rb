@@ -94,6 +94,50 @@ describe BotMetrics do
     end
   end
 
+  describe '#track' do
+    let(:client) { BotMetrics::Client.new(api_key: 'api_key', bot_id: 'bot_id') }
+    let!(:event) do
+      {
+        "name": "event",
+        "timestamp": "123456789.0"
+      }
+    end
+
+    context 'event is a hash' do
+      before do
+        stub_request(:post, "https://www.getbotmetrics.com/bots/bot_id/events?event=#{event.to_json}").
+          with(headers: { "Authorization" => 'api_key' }).
+          to_return(status: 201)
+      end
+
+      it { expect(client.track(event)).to be_truthy }
+    end
+
+    context 'event is a JSON string' do
+      before do
+        stub_request(:post, "https://www.getbotmetrics.com/bots/bot_id/events?event=#{event.to_json}").
+          with(headers: { "Authorization" => 'api_key' }).
+          to_return(status: 201)
+      end
+
+      it { expect(client.track(event.to_json)).to be_truthy }
+    end
+
+    context 'failures' do
+      it 'raises error when both event is not a hash' do
+        expect {
+          client.track(['abc', 'def'])
+        }.to raise_error("event is not a valid JSON string or Hash")
+      end
+
+      it 'raises error when event is not a valid JSON string' do
+        expect {
+          client.track('abc')
+        }.to raise_error("event is not a valid JSON string or Hash")
+      end
+    end
+  end
+
   describe '#message' do
     let(:client) { BotMetrics::Client.new(api_key: 'api_key', bot_id: 'bot_id') }
 

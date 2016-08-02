@@ -30,6 +30,28 @@ module BotMetrics
       response.code == 201
     end
 
+    def track(event)
+      event_json = nil
+
+      if event.is_a?(Hash)
+        event_json = event.to_json
+      elsif event.is_a?(String)
+        begin
+          event_json = JSON.parse(event)
+        rescue JSON::ParserError
+          raise ArgumentError.new("event is not a valid JSON string or Hash")
+        end
+        event_json = event
+      end
+
+      if event_json.nil?
+        raise ArgumentError.new("event is not a valid JSON string or Hash")
+      end
+
+      response = HTTP.auth(api_key).post("#{api_url}/events", params: {event: event_json})
+      response.code == 201
+    end
+
     def message(team_id, opts = {})
       channel = opts[:channel]
       user = opts[:user]
@@ -58,38 +80,37 @@ module BotMetrics
     end
 
     private
+    attr_accessor :api_key, :bot_id, :api_host
 
-      attr_accessor :api_key, :bot_id, :api_host
+    def blank?(attr)
+      attr.nil? || attr == ''
+    end
 
-      def blank?(attr)
-        attr.nil? || attr == ''
-      end
+    def api_url
+      "#{api_host}/bots/#{bot_id}"
+    end
 
-      def api_url
-        "#{api_host}/bots/#{bot_id}"
-      end
+    def options(extra_params)
+      {
+        headers: { "Authorization" => api_key },
+        omit_default_port: true,
+        idempotent: true,
+        retry_limit: 6,
+        read_timeout: 360,
+        connect_timeout: 360
+      }.merge(extra_params)
+    end
 
-      def options(extra_params)
-        {
-          headers: { "Authorization" => api_key },
-          omit_default_port: true,
-          idempotent: true,
-          retry_limit: 6,
-          read_timeout: 360,
-          connect_timeout: 360
-        }.merge(extra_params)
-      end
-
-      def message_attachments(attachments)
-        if attachments.nil?
-          nil
+    def message_attachments(attachments)
+      if attachments.nil?
+        nil
+      else
+        if attachments.is_a? String
+          attachments
         else
-          if attachments.is_a? String
-            attachments
-          else
-            attachments.to_json
-          end
+          attachments.to_json
         end
       end
+    end
   end
 end
