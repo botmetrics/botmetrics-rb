@@ -49,7 +49,7 @@ module BotMetrics
       end
 
       response = HTTP.auth(api_key).post("#{api_url}/events", params: {event: event_json})
-      response.code == 201
+      response.code == 202
     end
 
     def message(team_id, opts = {})

@@ -107,7 +107,7 @@ describe BotMetrics do
       before do
         stub_request(:post, "https://www.getbotmetrics.com/bots/bot_id/events?event=#{event.to_json}").
           with(headers: { "Authorization" => 'api_key' }).
-          to_return(status: 201)
+          to_return(status: 202)
       end
 
       it { expect(client.track(event)).to be_truthy }
@@ -117,7 +117,7 @@ describe BotMetrics do
       before do
         stub_request(:post, "https://www.getbotmetrics.com/bots/bot_id/events?event=#{event.to_json}").
           with(headers: { "Authorization" => 'api_key' }).
-          to_return(status: 201)
+          to_return(status: 202)
       end
 
       it { expect(client.track(event.to_json)).to be_truthy }
