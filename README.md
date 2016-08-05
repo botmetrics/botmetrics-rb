@@ -12,7 +12,7 @@ Status](https://travis-ci.org/botmetrics/botmetrics-rb.svg?branch=master)](https
 Add this line to your application's Gemfile:
 
 ```ruby
-gem 'botmetrics-rb'
+gem 'botmetrics-rb', require: 'botmetrics'
 ```
 
 And then execute:
@@ -23,10 +23,10 @@ Or install it yourself as:
 
     $ gem install botmetrics-rb
 
-## Usage
+## Usage (Facebook)
 
-Log in to your [BotMetrics](https://getbotmetrics.com) account, navigate
-to "Bot Settings" and find out your Bot ID and API Key.
+Register your Facebook bot with
+[Botmetrics](https://getbotmetrics.com). Once you have done so, navigate to "Bot Settings" and find out your Bot ID and API Key.
 
 With that, you can initialize a `BotMetrics::Client`:
 
@@ -38,7 +38,36 @@ Alternatively, you can set the following ENV variables
 
 - `ENV['BOTMETRICS_API_KEY']`
 - `ENV['BOTMETRICS_BOT_ID']`
-- `ENV['BOTMETRICS_API_HOST']`
+
+and initialize a `BotMetrics::Client` with the default ENV variables:
+
+```ruby
+client = BotMetrics::Client.new
+```
+
+### track
+
+Call the `track` API in the webhook receiver that handles all of your
+Facebook messages.
+
+```ruby
+client.track(params)
+```
+
+## Usage (Slack)
+
+Log in to your [BotMetrics](https://getbotmetrics.com) account, navigate to "Bot Settings" and find out your Bot ID and API Key.
+
+With that, you can initialize a `BotMetrics::Client`:
+
+```ruby
+client = BotMetrics::Client.new(api_key: '123', bot_id: '123')
+```
+
+Alternatively, you can set the following ENV variables
+
+- `ENV['BOTMETRICS_API_KEY']`
+- `ENV['BOTMETRICS_BOT_ID']`
 
 and initialize a `BotMetrics::Client` with the default ENV variables:
 
