@@ -105,7 +105,7 @@ describe BotMetrics do
 
     context 'event is a hash' do
       before do
-        stub_request(:post, "https://www.getbotmetrics.com/bots/bot_id/events?event=#{event.to_json}").
+        stub_request(:post, "https://www.getbotmetrics.com/bots/bot_id/events?event=#{event.to_json}&format=json").
           with(headers: { "Authorization" => 'api_key' }).
           to_return(status: 202)
       end
@@ -115,7 +115,7 @@ describe BotMetrics do
 
     context 'event is a JSON string' do
       before do
-        stub_request(:post, "https://www.getbotmetrics.com/bots/bot_id/events?event=#{event.to_json}").
+        stub_request(:post, "https://www.getbotmetrics.com/bots/bot_id/events?event=#{event.to_json}&format=json").
           with(headers: { "Authorization" => 'api_key' }).
           to_return(status: 202)
       end

@@ -48,7 +48,7 @@ module BotMetrics
         raise ArgumentError.new("event is not a valid JSON string or Hash")
       end
 
-      response = HTTP.auth(api_key).post("#{api_url}/events", params: {event: event_json})
+      response = HTTP.auth(api_key).post("#{api_url}/events", params: {event: event_json, format: 'json'})
       response.code == 202
     end
 
