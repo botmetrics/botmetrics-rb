@@ -54,6 +54,37 @@ Facebook messages.
 client.track(params)
 ```
 
+## Usage (Kik)
+
+Register your Kik bot with
+[Botmetrics](https://getbotmetrics.com). Once you have done so, navigate to "Bot Settings" and find out your Bot ID and API Key.
+
+With that, you can initialize a `BotMetrics::Client`:
+
+```ruby
+client = BotMetrics::Client.new(api_key: '123', bot_id: '123')
+```
+
+Alternatively, you can set the following ENV variables
+
+- `ENV['BOTMETRICS_API_KEY']`
+- `ENV['BOTMETRICS_BOT_ID']`
+
+and initialize a `BotMetrics::Client` with the default ENV variables:
+
+```ruby
+client = BotMetrics::Client.new
+```
+
+### track
+
+Call the `track` API in the webhook receiver that handles all of your
+Facebook messages.
+
+```ruby
+client.track(params)
+```
+
 ## Usage (Slack)
 
 Log in to your [BotMetrics](https://getbotmetrics.com) account, navigate to "Bot Settings" and find out your Bot ID and API Key.
