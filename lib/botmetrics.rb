@@ -79,6 +79,21 @@ module BotMetrics
       response.code == 202
     end
 
+    def short_link(url, user_id, opts = {})
+      params = {
+        'user_id' => user_id,
+        'url'     => url,
+      }.merge(opts).delete_if { |_, v| v.nil? }
+
+      response = HTTP.auth(api_key).post("#{api_url}/short_links", params: params)
+
+      if response.code == 200
+        JSON.parse(response.body)['url']
+      else
+        return nil
+      end
+    end
+
     private
     attr_accessor :api_key, :bot_id, :api_host
 

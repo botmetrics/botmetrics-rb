@@ -185,4 +185,30 @@ describe BotMetrics do
       end
     end
   end
+
+  describe '#short_link' do
+    context 'when api_host is not set' do
+      let(:client) { BotMetrics::Client.new(api_key: 'api_key', bot_id: 'bot_id') }
+
+      before do
+        stub_request(:post, "https://www.getbotmetrics.com/bots/bot_id/short_links?url=https://www.google.com&user_id=123").
+          with(headers: { "Authorization" => 'api_key' }).
+          to_return(body: "{\"url\": \"https://bot.af/to/deadbeef\"}", status: 200)
+      end
+
+      it { expect(client.short_link('https://www.google.com', '123')).to eql 'https://bot.af/to/deadbeef' }
+    end
+
+    context 'when api_host is set' do
+      let(:client) { BotMetrics::Client.new(api_key: 'api_key', bot_id: 'bot_id', api_host: 'http://localhost:5000') }
+
+      before do
+        stub_request(:post, "http://localhost:5000/bots/bot_id/short_links?url=https://www.google.com&user_id=123").
+          with(headers: { "Authorization" => 'api_key' }).
+          to_return(body: "{\"url\": \"https://bot.af/to/deadbeef\"}", status: 200)
+      end
+
+      it { expect(client.short_link('https://www.google.com', '123')).to eql 'https://bot.af/to/deadbeef' }
+    end
+  end
 end
